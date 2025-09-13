@@ -1,0 +1,23 @@
+<div class="header">
+  <div class="logo">
+    <img src="assets/image/novosga-navbar.png" alt="Logo CNT" style="height:35px;" />
+  </div>
+</div>
+
+<div class="container">
+  <div style="display:flex;align-items:center;gap:30px">
+    <div>
+      <div class="hola" style="color:#0095db">Hola</div>
+      <div class="sub" style="color:#0095db">Bienvenidos al sistema de agendamiento web</div>
+      <div style="margin-top:18px; display:flex; flex-direction:column; gap:10px; align-items:flex-start;">
+        <button pButton type="button" label="Agendar una cita" class="p-button-raised" (click)="openNew()"
+          style="background:#0095db;border:none; width:253px;"></button>
+        <button pButton type="button" label="Ver mis agendamientos" class="p-button-outlined" (click)="openMy()"
+          style="width:253px;"></button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<app-appointment-modal #appt (closed)="null"></app-appointment-modal>
+<app-my-appointments-modal #myappts (closed)="null"></app-my-appointments-modal>

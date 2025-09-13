@@ -1,0 +1,137 @@
+<div *ngIf="show" class="modal-backdrop">
+  <div class="modal-card" role="dialog" aria-modal="true">
+    <div class="modal-header">Agendar una cita <button
+        style="float:right;background:transparent;border:none;color:#fff;font-size:18px;cursor:pointer"
+        (click)="close()">✖</button></div>
+    <div class="modal-body">
+      <form [formGroup]="form" (ngSubmit)="submit()">
+        <div class="form-row">
+          <div class="form-label">* Identificación :</div>
+          <div style="flex:1;display:flex;gap:8px">
+            <p-dropdown [options]="idTypes" formControlName="idType" optionLabel="label" placeholder="ID"></p-dropdown>
+            <input pInputText style="width: auto;" placeholder="Digite identificación" formControlName="idNumber"
+              required />
+
+            <div *ngIf="form.get('names')?.invalid && form.get('names')?.touched" style="color:red;font-size:12px">
+              Ingrese su Identificación
+            </div>
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-label">* Nombres :</div>
+          <input pInputText style="width: auto;" formControlName="names" placeholder="Digite nombre y apellido"
+            required />
+
+          <div *ngIf="form.get('names')?.invalid && form.get('names')?.touched" style="color:red;font-size:12px">
+            Ingrese su nombre y apellido
+          </div>
+        </div>
+
+
+        <div class="form-row">
+          <div class="form-label">* Email :</div>
+          <input pInputText style="width: auto;" formControlName="email" placeholder="Digite email" />
+          <div *ngIf="form.get('email')?.invalid && form.get('email')?.touched" style="color:red;font-size:12px">
+            Ingrese un email válido
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-label">* Celular :</div>
+          <input pInputText style="width: auto;" formControlName="cellphone" placeholder="Digite celular"
+            maxlength="10" />
+          <div *ngIf="form.get('cellphone')?.invalid && form.get('cellphone')?.touched"
+            style="color:red;font-size:12px">
+            Ingrese un Celular
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-label">* Servicio :</div>
+          <p-dropdown [options]="services" formControlName="service" placeholder="Elija un servicio"
+            (onChange)="onService()">
+            <ng-template pTemplate="item" let-service>
+              <img [style.width.px]="40" [style.backgroundColor]="service.color" src="../../../assets{{service.image}}"
+                class="ng-star-inserted">
+              {{service.label}}
+            </ng-template>
+          </p-dropdown>
+          <div *ngIf="form.get('service')?.invalid && form.get('service')?.touched" style="color:red;font-size:12px">
+            Ingrese un Servicio
+          </div>
+        </div>
+
+        <div class="form-row" *ngIf="form.value.service">
+          <div
+            style="text-align:justify; margin-top:10px; margin-bottom:10px; font-weight:5; font-size:14px; margin-left:150px;margin-right:150px; word-break: normal">
+            {{ getSelectedServiceDescription() }}
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-label">* Provincia :</div>
+          <p-dropdown [options]="provinces" formControlName="province" (onChange)="onProvinceChange()"
+            placeholder="Elija una provincia">
+            <ng-template pTemplate="item" let-province>
+              {{province}}
+            </ng-template>
+          </p-dropdown>
+          <div *ngIf="form.get('province')?.invalid && form.get('province')?.touched" style="color:red;font-size:12px">
+            Ingrese una Provincia
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-label">* Agencia :</div>
+          <p-dropdown [options]="agencies" formControlName="agency" placeholder="Elija una agencia"></p-dropdown>
+          <ng-template pTemplate="item" let-agencies>
+            {{agencies.label}}
+          </ng-template>
+          <div *ngIf="form.get('agency')?.invalid && form.get('agency')?.touched" style="color:red;font-size:12px">
+            Ingrese una Agencia
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-label">* Fecha :</div>
+          <p-calendar formControlName="date" dateFormat="dd/mm/yy" placeholder="Seleccione una fecha" [showIcon]="true"
+            [touchUI]="false" [inline]="false" />
+          <div *ngIf="form.get('date')?.invalid && form.get('date')?.touched" style="color:red;font-size:12px">
+            Ingrese una Fecha
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-label">* Hora :</div>
+          <p-calendar formControlName="time" [timeOnly]="true" [showIcon]="true" placeholder="Seleccione una hora"
+            hourFormat="24" [stepMinute]="15" />
+          <div *ngIf="form.get('time')?.invalid && form.get('time')?.touched" style="color:red;font-size:12px">
+            Ingrese la Hora
+          </div>
+        </div>
+
+
+        <div class="form-row">
+          <div class="form-label">
+            ¿Cuánto es {{ numA }} + {{ numB }} ?
+          </div>
+          <input pInputText style="width: auto" formControlName="captcha" placeholder="Digite la suma" />
+          <div *ngIf="captchaInvalid" style="color:red; font-size:12px">
+            Ingresa la suma correcta
+          </div>
+        </div>
+
+        <p
+          style="text-align:justify; margin-top:10px; margin-bottom:10px; font-weight:5; font-size:14px; margin-left:150px;margin-right:150px; word-break: normal">
+          Necesitamos asegurarnos que eres humano.</p>
+        <div class="footer-actions">
+          <button pButton type="submit" label="Enviar" class="p-button"
+            style="background:#0095db;border:none;"></button>
+          <button pButton type="button" label="Cerrar" class="p-button-secondary" (click)="close()"></button>
+        </div>
+
+      </form>
+    </div>
+  </div>
+</div>

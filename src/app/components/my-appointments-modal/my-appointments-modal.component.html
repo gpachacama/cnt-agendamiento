@@ -1,0 +1,48 @@
+<div *ngIf="show" class="modal-backdrop">
+  <div class="modal-card" role="dialog">
+    <div class="modal-header">Mis agendamientos
+      <button style="float:right;background:transparent;border:none;color:#fff;font-size:18px;cursor:pointer"
+        (click)="close()">✖</button>
+    </div>
+    <div class="modal-body">
+      <div style="display:flex;gap:8px;margin-bottom:12px">
+        <input pInputText class="form-control" placeholder="Digite su identificación" [(ngModel)]="idNumber" />
+        <button pButton type="button" label="Buscar" (click)="buscar()"
+          style="background:#0095db;border:none;"></button>
+        <button pButton type="button" label="Limpiar" class="p-button-outlined" (click)="limpiar()"></button>
+      </div>
+
+      <p-table [value]="paginatedResults" [paginator]="true" [rows]="rowsPerPage" [totalRecords]="totalRecords"
+        [rowsPerPageOptions]="[5, 10, 20]" (onPage)="onPageChange($event)" *ngIf="results && results.length>0">
+        <ng-template pTemplate="header">
+          <tr>
+            <th>#</th>
+            <th>Agencia</th>
+            <th>Horario</th>
+            <th>Servicio</th>
+            <th>Fecha</th>
+            <th>Hora</th>
+            <th>Confirmación</th>
+          </tr>
+        </ng-template>
+        <ng-template pTemplate="body" let-r let-i="rowIndex">
+          <tr>
+            <td>{{(currentPage - 1) * rowsPerPage + i + 1}}</td>
+            <td>{{r.agency}}</td>
+            <td>{{r.cellphone}}</td>
+            <td>{{r.service}}</td>
+            <td>{{r.date}}</td>
+            <td>{{r.time}}</td>
+            <td>{{r.confirmation}}</td>
+          </tr>
+        </ng-template>
+      </p-table>
+
+      <div *ngIf="!results || results.length===0" class="no-data">No hay datos</div>
+    </div>
+
+    <div class="footer-actions">
+      <button pButton type="button" label="Cerrar" class="p-button-outlined" (click)="close()"></button>
+    </div>
+  </div>
+</div>

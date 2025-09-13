@@ -1,0 +1,70 @@
+:host { display:block; }
+
+.modal-backdrop { 
+  position:fixed; 
+  left:0; 
+  right:0; 
+  top:0; 
+  bottom:0; 
+  background: rgba(0,0,0,0.55); 
+  display:flex; 
+  justify-content:center; 
+  align-items:center; 
+  z-index:1000;
+}
+
+.modal-card { 
+    background:#fff; 
+    width: 65vw;           // Más ancho (95% del viewport)
+    height: 65vh;         // Más alto (90% del viewport)
+    max-width: 1200px;    // Ancho máximo aumentado
+    border-radius:8px;    // Bordes más redondeados
+    box-shadow:0 10px 50px rgba(0,0,0,0.3); // Sombra más pronunciada
+    overflow:hidden; 
+    display: flex;
+    flex-direction: column;
+  }
+
+.modal-header { 
+  background:#0095db; 
+  color:#fff; 
+  padding:14px 18px; 
+  font-weight:600; 
+}
+
+.modal-body { 
+  padding:20px; 
+  overflow-y: auto;
+  flex-grow: 1;
+}
+
+.no-data { 
+  text-align:center; 
+  color:#999; 
+  padding:40px 0; 
+}
+
+.footer-actions { 
+  display:flex; 
+  justify-content:flex-end; 
+  gap:8px; 
+  padding:14px; 
+  border-top:1px solid #f0f0f0; 
+}
+
+// Estilos para la paginación
+::ng-deep .p-paginator {
+  margin-top: 10px;
+  justify-content: center;
+}
+
+::ng-deep .p-paginator .p-paginator-pages .p-paginator-page {
+  min-width: 2.5rem;
+  height: 2.5rem;
+}
+
+::ng-deep .p-paginator .p-paginator-pages .p-paginator-page.p-highlight {
+  background: #0095db;
+  border-color: #0095db;
+  color: #fff;
+}

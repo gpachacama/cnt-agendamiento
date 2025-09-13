@@ -1,0 +1,14 @@
+:root {
+  --cnt-celeste: #0095db;
+}
+.header {
+  height:64px;
+  display:flex;
+  align-items:center;
+  padding:0 16px;
+  border-bottom:1px solid #e6e6e6;
+}
+.logo { color: var(--cnt-celeste); font-weight:700; font-size:20px; }
+.container { max-width:1100px; margin:40px auto; padding:0 16px; }
+.hola { color: var(--cnt-celeste); font-size:40px; font-weight:700; }
+.sub { color:#2f9fb7; margin-top:6px; font-size:30px; }
