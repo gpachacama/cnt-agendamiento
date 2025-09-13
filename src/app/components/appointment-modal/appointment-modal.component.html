@@ -22,7 +22,6 @@
           <div class="form-label">* Nombres :</div>
           <input pInputText style="width: auto;" formControlName="names" placeholder="Digite nombre y apellido"
             required />
-
           <div *ngIf="form.get('names')?.invalid && form.get('names')?.touched" style="color:red;font-size:12px">
             Ingrese su nombre y apellido
           </div>
@@ -61,7 +60,6 @@
             Ingrese un Servicio
           </div>
         </div>
-
         <div class="form-row" *ngIf="form.value.service">
           <div
             style="text-align:justify; margin-top:10px; margin-bottom:10px; font-weight:5; font-size:14px; margin-left:150px;margin-right:150px; word-break: normal">
@@ -84,10 +82,12 @@
 
         <div class="form-row">
           <div class="form-label">* Agencia :</div>
-          <p-dropdown [options]="agencies" formControlName="agency" placeholder="Elija una agencia"></p-dropdown>
-          <ng-template pTemplate="item" let-agencies>
-            {{agencies.label}}
-          </ng-template>
+          <p-dropdown [options]="agencies" formControlName="agency" placeholder="Elija una agencia"
+            (onChange)="onAgencyChange()">
+            <ng-template pTemplate="item" let-agencies>
+              {{agencies.label}}
+            </ng-template>
+          </p-dropdown>
           <div *ngIf="form.get('agency')?.invalid && form.get('agency')?.touched" style="color:red;font-size:12px">
             Ingrese una Agencia
           </div>
@@ -96,7 +96,7 @@
         <div class="form-row">
           <div class="form-label">* Fecha :</div>
           <p-calendar formControlName="date" dateFormat="dd/mm/yy" placeholder="Seleccione una fecha" [showIcon]="true"
-            [touchUI]="false" [inline]="false" />
+            [touchUI]="false" [inline]="false" (onSelect)="onDateChange()" />
           <div *ngIf="form.get('date')?.invalid && form.get('date')?.touched" style="color:red;font-size:12px">
             Ingrese una Fecha
           </div>
@@ -104,13 +104,16 @@
 
         <div class="form-row">
           <div class="form-label">* Hora :</div>
-          <p-calendar formControlName="time" [timeOnly]="true" [showIcon]="true" placeholder="Seleccione una hora"
-            hourFormat="24" [stepMinute]="15" />
-          <div *ngIf="form.get('time')?.invalid && form.get('time')?.touched" style="color:red;font-size:12px">
+          <p-dropdown [options]="availableHours" formControlName="hour" placeholder="Seleccione una hora">
+          </p-dropdown>
+          <div *ngIf="form.get('hour')?.invalid && form.get('hour')?.touched" style="color:red;font-size:12px">
             Ingrese la Hora
           </div>
+          <div *ngIf="availableHours.length === 0 && form.value.date && form.value.agency"
+            style="color:red;font-size:12px">
+            No hay horas disponibles para esta fecha
+          </div>
         </div>
-
 
         <div class="form-row">
           <div class="form-label">

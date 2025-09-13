@@ -19,6 +19,7 @@ export class AppointmentModalComponent {
   provinces: any[] = [];
   cities: any[] = [];
   agencies: any[] = [];
+  availableHours: any[] = [];
 
   numA!: number;
   numB!: number;
@@ -36,12 +37,16 @@ export class AppointmentModalComponent {
       city: [null, Validators.required],
       agency: [null, Validators.required],
       date: [null, Validators.required],
-      time: ['', Validators.required],
+      hour: ['', Validators.required],
       captcha: ['', Validators.required]
     });
   }
 
   async open() {
+    this.form.get('province')?.disable();
+    this.form.get('agency')?.disable();
+    this.form.get('date')?.disable();
+    this.form.get('hour')?.disable();
     this.show = true;
     this.generateCaptcha();
     try {
@@ -78,6 +83,9 @@ export class AppointmentModalComponent {
     this.captchaInvalid = false;
     this.provinces = [];
     this.agencies = [];
+    // Limpiar combo de horas y lista
+    this.form.get('hour')?.setValue(null);
+    this.availableHours = [];
   }
 
   async onService() {
@@ -86,6 +94,7 @@ export class AppointmentModalComponent {
     try {
       const provinces = await this.svc.getProvinces(serv);
       this.provinces = provinces.map(p => p);
+      this.form.get('province')?.enable();
     } catch (err) {
       console.error("Error provincias:", err);
     }
@@ -99,10 +108,24 @@ export class AppointmentModalComponent {
   async onProvinceChange() {
     const prov = this.form.value.province;
     const serv = this.form.value.service;
-    if (!prov || !serv) return;
     try {
       const agencies = await this.svc.getAgencies(prov, serv);
       this.agencies = agencies.map(a => ({ label: a.nome, value: a.id }));
+      this.form.get('agency')?.enable();
+    } catch (err) {
+      console.error("Error agencias:", err);
+    }
+  }
+
+
+  async onAgencyChange() {
+    const agencyTemp = this.form.value.agency;
+    try {
+      if (agencyTemp || this.agencies.length > 0) {
+        this.form.get('date')?.enable();
+      } else {
+        return;
+      };
     } catch (err) {
       console.error("Error agencias:", err);
     }
@@ -113,6 +136,19 @@ export class AppointmentModalComponent {
     return emailRegex.test(email);
   }
 
+  async onDateChange() {
+    try {
+      const hours = await this.svc.getAvailableHours(this.form.value.agency, this.form.value.date);
+      console.log("hours", hours);
+      // Convertir el objeto en un array [{label:'08:00', value:'08:00'}, ...]
+      this.availableHours = Object.keys(hours as { [key: string]: any })
+        .filter((h: any) => hours[h].enabled)
+        .map((h) => ({ label: h, value: h }));
+      this.form.get('hour')?.enable();
+    } catch (err) {
+      console.error("Error agencias:", err);
+    }
+  }
 
 
   async submit() {

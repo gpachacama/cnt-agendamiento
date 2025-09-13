@@ -99,4 +99,23 @@ export class AppointmentService {
       throw err;
     }
   }
+
+
+  async getAvailableHours(IdAgency: string, fechaAgendamiento: string): Promise<any[]> {
+    try {
+      // Formatear fecha a YYYY-MM-DD
+      const fecha = new Date(fechaAgendamiento).toISOString().split('T')[0];
+      console.log("getAvailableHours", IdAgency, fecha);
+      const response = await axios.post(`${this.API_BASE}/unidades/${IdAgency}/horas`, {
+        fecha
+      })
+      return response.data.data;
+    } catch (err) {
+      console.error('Error en getAvailableHours:', err);
+      throw err;
+    }
+  }
+
+
+
 }
