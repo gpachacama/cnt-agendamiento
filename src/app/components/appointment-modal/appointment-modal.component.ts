@@ -25,6 +25,8 @@ export class AppointmentModalComponent {
   numB!: number;
   captchaInvalid = false;
 
+  feriadosAjustados: any[] = [];
+
   constructor(private fb: FormBuilder, private svc: AppointmentService) {
     this.form = this.fb.group({
       idType: ['ID', Validators.required],
@@ -123,6 +125,7 @@ export class AppointmentModalComponent {
     try {
       if (agencyTemp || this.agencies.length > 0) {
         this.form.get('date')?.enable();
+        this.obtenerFeriadosEcuador(2025);
       } else {
         return;
       };
@@ -316,5 +319,38 @@ export class AppointmentModalComponent {
         confirmButtonText: 'Entendido'
       });
     }
+  }
+
+  async obtenerFeriadosEcuador(anio: number) {
+    const response = await fetch(`https://date.nager.at/api/v3/PublicHolidays/${anio}/EC`);
+    const data = await response.json();
+    // Ajustamos todos los feriados y convertimos a Date
+    this.feriadosAjustados = data.map((feriado: any) => {
+      const fechaAjustada = this.ajustarFeriado(feriado.date);
+      return new Date(fechaAjustada);  // ⬅️ aquí convertimos a Date
+    });
+    console.log("Feriados Ajustados:", this.feriadosAjustados);
+  }
+
+
+  ajustarFeriado(fecha: string): string {
+    const feriado = new Date(fecha);
+    const diaSemana = feriado.getDay(); // 0=domingo, 1=lunes, ..., 6=sábado
+    // Copiamos la fecha para no modificar el objeto original
+    let fechaAjustada = new Date(feriado);
+    if (diaSemana === 0) {
+      // Domingo -> Lunes siguiente
+      fechaAjustada.setDate(feriado.getDate() + 1);
+    } else if (diaSemana === 6) {
+      // Sábado -> Viernes anterior
+      fechaAjustada.setDate(feriado.getDate() - 1);
+    } else if (diaSemana === 2) {
+      // Martes -> Lunes
+      fechaAjustada.setDate(feriado.getDate() - 1);
+    } else if (diaSemana === 3 || diaSemana === 4) {
+      // Miércoles o jueves -> Viernes
+      fechaAjustada.setDate(feriado.getDate() + (5 - diaSemana));
+    }
+    return fechaAjustada.toISOString().split('T')[0]; // Devuelve en formato YYYY-MM-DD
   }
 }

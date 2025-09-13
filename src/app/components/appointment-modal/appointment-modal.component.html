@@ -11,7 +11,6 @@
             <p-dropdown [options]="idTypes" formControlName="idType" optionLabel="label" placeholder="ID"></p-dropdown>
             <input pInputText style="width: auto;" placeholder="Digite identificación" formControlName="idNumber"
               required />
-
             <div *ngIf="form.get('names')?.invalid && form.get('names')?.touched" style="color:red;font-size:12px">
               Ingrese su Identificación
             </div>
@@ -96,7 +95,7 @@
         <div class="form-row">
           <div class="form-label">* Fecha :</div>
           <p-calendar formControlName="date" dateFormat="dd/mm/yy" placeholder="Seleccione una fecha" [showIcon]="true"
-            [touchUI]="false" [inline]="false" (onSelect)="onDateChange()" />
+            [touchUI]="false" [inline]="false" (onSelect)="onDateChange()" [disabledDates]="feriadosAjustados" />
           <div *ngIf="form.get('date')?.invalid && form.get('date')?.touched" style="color:red;font-size:12px">
             Ingrese una Fecha
           </div>
