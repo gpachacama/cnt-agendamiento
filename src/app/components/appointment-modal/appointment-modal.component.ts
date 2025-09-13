@@ -19,10 +19,13 @@ export class AppointmentModalComponent {
   provinces: any[] = [];
   cities: any[] = [];
   agencies: any[] = [];
+  availableHours: any[] = [];
 
   numA!: number;
   numB!: number;
   captchaInvalid = false;
+
+  feriadosAjustados: any[] = [];
 
   constructor(private fb: FormBuilder, private svc: AppointmentService) {
     this.form = this.fb.group({
@@ -36,12 +39,16 @@ export class AppointmentModalComponent {
       city: [null, Validators.required],
       agency: [null, Validators.required],
       date: [null, Validators.required],
-      time: ['', Validators.required],
+      hour: ['', Validators.required],
       captcha: ['', Validators.required]
     });
   }
 
   async open() {
+    this.form.get('province')?.disable();
+    this.form.get('agency')?.disable();
+    this.form.get('date')?.disable();
+    this.form.get('hour')?.disable();
     this.show = true;
     this.generateCaptcha();
     try {
@@ -78,6 +85,9 @@ export class AppointmentModalComponent {
     this.captchaInvalid = false;
     this.provinces = [];
     this.agencies = [];
+    // Limpiar combo de horas y lista
+    this.form.get('hour')?.setValue(null);
+    this.availableHours = [];
   }
 
   async onService() {
@@ -86,6 +96,7 @@ export class AppointmentModalComponent {
     try {
       const provinces = await this.svc.getProvinces(serv);
       this.provinces = provinces.map(p => p);
+      this.form.get('province')?.enable();
     } catch (err) {
       console.error("Error provincias:", err);
     }
@@ -99,10 +110,25 @@ export class AppointmentModalComponent {
   async onProvinceChange() {
     const prov = this.form.value.province;
     const serv = this.form.value.service;
-    if (!prov || !serv) return;
     try {
       const agencies = await this.svc.getAgencies(prov, serv);
       this.agencies = agencies.map(a => ({ label: a.nome, value: a.id }));
+      this.form.get('agency')?.enable();
+    } catch (err) {
+      console.error("Error agencias:", err);
+    }
+  }
+
+
+  async onAgencyChange() {
+    const agencyTemp = this.form.value.agency;
+    try {
+      if (agencyTemp || this.agencies.length > 0) {
+        this.form.get('date')?.enable();
+        this.obtenerFeriadosEcuador(2025);
+      } else {
+        return;
+      };
     } catch (err) {
       console.error("Error agencias:", err);
     }
@@ -113,6 +139,19 @@ export class AppointmentModalComponent {
     return emailRegex.test(email);
   }
 
+  async onDateChange() {
+    try {
+      const hours = await this.svc.getAvailableHours(this.form.value.agency, this.form.value.date);
+      console.log("hours", hours);
+      // Convertir el objeto en un array [{label:'08:00', value:'08:00'}, ...]
+      this.availableHours = Object.keys(hours as { [key: string]: any })
+        .filter((h: any) => hours[h].enabled)
+        .map((h) => ({ label: h, value: h }));
+      this.form.get('hour')?.enable();
+    } catch (err) {
+      console.error("Error agencias:", err);
+    }
+  }
 
 
   async submit() {
@@ -280,5 +319,38 @@ export class AppointmentModalComponent {
         confirmButtonText: 'Entendido'
       });
     }
+  }
+
+  async obtenerFeriadosEcuador(anio: number) {
+    const response = await fetch(`https://date.nager.at/api/v3/PublicHolidays/${anio}/EC`);
+    const data = await response.json();
+    // Ajustamos todos los feriados y convertimos a Date
+    this.feriadosAjustados = data.map((feriado: any) => {
+      const fechaAjustada = this.ajustarFeriado(feriado.date);
+      return new Date(fechaAjustada);  // ⬅️ aquí convertimos a Date
+    });
+    console.log("Feriados Ajustados:", this.feriadosAjustados);
+  }
+
+
+  ajustarFeriado(fecha: string): string {
+    const feriado = new Date(fecha);
+    const diaSemana = feriado.getDay(); // 0=domingo, 1=lunes, ..., 6=sábado
+    // Copiamos la fecha para no modificar el objeto original
+    let fechaAjustada = new Date(feriado);
+    if (diaSemana === 0) {
+      // Domingo -> Lunes siguiente
+      fechaAjustada.setDate(feriado.getDate() + 1);
+    } else if (diaSemana === 6) {
+      // Sábado -> Viernes anterior
+      fechaAjustada.setDate(feriado.getDate() - 1);
+    } else if (diaSemana === 2) {
+      // Martes -> Lunes
+      fechaAjustada.setDate(feriado.getDate() - 1);
+    } else if (diaSemana === 3 || diaSemana === 4) {
+      // Miércoles o jueves -> Viernes
+      fechaAjustada.setDate(feriado.getDate() + (5 - diaSemana));
+    }
+    return fechaAjustada.toISOString().split('T')[0]; // Devuelve en formato YYYY-MM-DD
   }
 }
